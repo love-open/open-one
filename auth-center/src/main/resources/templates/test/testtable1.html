@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="default/list_css::top"></head>
+<style type="text/css">
+    /* 给dataTable的进度条设置最顶层显示 */
+	.dataTables_processing{
+	   z-index: 1000;
+	}
+</style>
+<body class="">
+
+    <div class="">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                计划管理
+                <small>生产计划</small>
+            </h1>
+        </section>
+        <section class="search-box collapse" id="collapseExample">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>订单状态</label>
+                                            <select class="form-control" id='salesOrderStateItems'>
+                                                <option value="1">已排产</option>
+                                                <option value="2" selected = "true">进行中</option> <!-- 默认一直选中进行中的 -->
+                                                <option value="3">已完成</option>
+                                                <option value="4">异常</option>
+                                                <!-- <option value="4">暂停</option> -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>下单日期</label>
+                                            <div class="input-group date">
+                                                <input type="text" class="form-control input_query" id="ordertime" autocomplete='off'>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>评审交期</label>
+                                            <div class="input-group date">
+                                                <input type="text" class="form-control input_query" id="reviewdelivery" autocomplete='off'>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>预交付期</label>
+                                            <div class="input-group date">
+                                                <input type="text" class="form-control input_query" id="customerdelivery" autocomplete='off'>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>订单编号</label>
+                                            <input type="text" class="form-control input_query" placeholder="" id="ordernum">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>车号</label>
+                                            <input type="text" class="form-control input_query" placeholder="" id="carnumber">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>业务员</label>
+                                            <input type="text" class="form-control input_query" placeholder="" id="peoplename">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>客户名称</label>
+                                            <input type="text" class="form-control input_query" placeholder="" id="customername">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-btn">
+                                    <button type="button" class="btn btn-primary" id="queryBtn">查询</button>
+                                    <button type="button" class="btn btn-default" id="clearBtn">清空</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="search-box collapse" id="operation">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-sm-4 col-md-3">
+                                        <div class="form-group">
+                                            <label>订单编号</label>
+                                            <input type="text" class="form-control input_query" placeholder="" id="ordernumber" name="ordernumber">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-btn">
+                                    <button type="button" class="btn btn-primary" id="suspendBtn">暂停订单</button>
+                                    <button type="button" class="btn btn-primary" id="restoreBtn">恢复订单</button>
+                                    <!--
+                                    <button type="button" class="btn btn-default" id="deleteBtn">删除订单</button>
+                                    -->
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header box-table-header">
+                            <h3 class="box-title">
+                                <span class="label label-default">未开始</span>
+                                <span class="label label-info">进行中</span>
+                                <span class="label label-danger">异常</span>
+                                <span class="label label-success">已完成</span>
+                                <span class="label label-warning">暂停</span>
+                            </h3>
+                            <div class="pull-right">
+                                <a class="btn btn-default pull-right" role="button" data-toggle="collapse" onclick="save()">保存</a>
+                                <a class="btn btn-default pull-right" role="button" data-toggle="collapse" href="#operation" aria-expanded="true" aria-controls="collapseExample">操作</a>
+                                <a class="btn btn-default pull-right" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="true" aria-controls="collapseExample">高级搜索</a>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body table-responsive no-padding"> 
+                            <table id="dataTable" class="table table-bordered table-striped table-hover" style="width:100%">
+							    <thead>
+							           <tr id="colTr">
+							           </tr>
+							    </thead>
+							    <tbody id="colTb">  
+							    </tbody>  
+							</table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+</body>
+<script th:replace="default/list_js::importjs"> </script>
+
+<script th:inline="none">
+
+//数据表
+var dataTable;
+var colsDef = [];//动态表头显示的列的数组
+$(function() {
+	//初始化table
+	initTable();
+	//查询按钮                
+	$("#queryBtn").click(function() {
+		//$("#colTb").html("");
+		dataTable.ajax.reload();
+	});
+})
+function initTable() {
+	$.ajax({
+		url : "/test/getcol",//url
+		type : 'POST',
+		data : '',
+		success : function(resdata) {
+			//请求成功后 如果存在datatable结构销毁
+			if (dataTable) {
+				dataTable.destroy();
+			}
+			//清空table数据 
+			$("#colTb").html("");
+			var obj = resdata.colist;//获取表头列名List
+			//var tableData = resdata.data;//获取table数据
+			var cols = obj.length;
+			if (cols > 0) {//构建jsp的table表头显示
+				$("#colTr").html((function(cols) {
+					var html = "<th><div align='center'><input type='checkbox' id='checkAll'></div></th>";
+					var colsNameCN;
+					for (var i = 0; i < cols; i++) { //这里遍历后台返回的字段信息集合
+						//alert(obj[i].column_cn);
+						colsNameCN = obj[i].column_cn;//这里取的字段信息的中文名
+						var html1 = ""
+						if (colsNameCN.length > 15) {//字段中文名过长截取显示
+							html1 += "<span title='"+colsNameCN+"'>" + colsNameCN.substr(0, 14) + "...</span>";//title鼠标悬浮显示全部字段中文名
+							html += $("<th></th>").append(html1).prop("outerHTML");//构建table表头的html
+						} else {
+							html += $("<th></th>").append(colsNameCN).prop("outerHTML");//构建table表头的html
+
+						}
+				    }
+
+					return html;
+				})(cols));
+			
+				//var colsDef = [];//定义表头列名
+				var checkboxCol = {
+		        	"data": {},
+		            "render": function (data, type) {
+		                return "<div align='center'><input type='checkbox' name='child' value='" + data.student_id + "," + data.groupby_col + "'></div>" ;
+		            }
+		        }
+			    colsDef.push(checkboxCol);
+				for (var i = 0; i < cols; i++) {
+					var colsNameEN;
+					colsNameEN = obj[i].column_en;//这里取的字段信息的英文名 和tabledata的key值对应
+					colsDef.push((function(colsNameEN, i) {
+						var colItem = {
+							data : colsNameEN,
+							render : function(data, type, full, meta) {
+								//控制不用编辑框的列
+								if(i == 0){
+									return data;
+								}
+								//后面的列添加编辑框
+								var str = "";
+								str += "<div class='input-group date form-control-sm'>";
+							    str += "	<input type='text' class='form-control pull-right' id='" + colsNameEN +  "_" + full.student_id + "' name='" + colsNameEN + "'  value='" + data + "' autocomplete='off'>";
+							    //str += "		<div class='input-group-addon'>";
+							    //str += "			<i class='fa fa-calendar'></i>";
+							    //str += "		</div>";
+							    str += "</div>";
+								return str;
+							}
+						}
+						return colItem;
+					})(colsNameEN, i));
+				}
+			}
+			//datatable初始化
+			dataTable = $('#dataTable').DataTable({
+				"dom": '<"top"Bf>rt<"datatable-footer"lip><"clear">',//改变各显示项的位置
+		        'language': {"url": "/datatables_language.json"},//显示的文字内容
+				//"ordering" : false,//不查询排序(前端排序)
+				//"info" : true,
+				//"bLengthChange" : false,
+				"bFilter" : false,
+				//"bAutoWidth" : false,//宽度自适应
+				//"retrieve" : true,
+				'bPaginate': true,//控制是否分页
+				"serverSide": true,//表示后台分页
+				"aLengthMenu": [10, 25, 50, 100],//分页的长度
+			    "iDisplayLength" : 10,//默认分页的长度
+			    "bSort" : true,//设置排序(不能与ordering共存)
+		        "aaSorting": [[ 1, 'asc']],//默认取第一列升序
+		        "aoColumnDefs": [{ "bSortable": false, "aTargets": [0,2,3,4,5,6,7]}],//设置不排序列
+		        "bDestory": true,
+		        "bRetrieve": true,
+				"bProcessing" : true,
+				"scrollX" : true,
+				"fixedColumns" : true,
+				//"bScrollAutoCss" : true,
+				"sAjaxSource" : "/test/getdata",//获取数据url
+				"fnServerData": function ( sSource, Data, fnCallback) {//控制向后台传输参数
+		            /*获取排序列的序号*/
+		            var index = '';
+		            /*获取排序规则*/
+		            var orderType = '';
+		            /*获取排序节点,节点与数据库实体类保持一致*/
+		            var orderNode = '';
+
+		            for(var i in Data){
+		                if(Data[i].name == 'iSortCol_0'){
+		                    index = Data[i].value;
+		                }
+		                if(Data[i].name == 'sSortDir_0'){
+		                    orderType = Data[i].value;
+		                }
+		            }
+
+		            for(var i in Data){
+		                if(Data[i].name == 'mDataProp_'+index){
+		                    orderNode = Data[i].value;
+		                }
+		                
+		                //解决渲染的列获取全部字段后不能获取排序字段名称的问题
+		                if(index == 4){
+		                	orderNode = "productCode";
+		                }else if(index == 5){
+		                	orderNode = "carNumber";
+		                }
+		                
+		            }
+					//console.log(Data);
+		            switch (orderNode) {
+		              case "productOrderCode": orderNode = "product_order_code";break;
+		              case "productCode": orderNode = "product_code";break;
+		              case "carNumber": orderNode = "car_number";break;
+		              case "orderDate": orderNode = "order_date";break;
+		              case "auditDate": orderNode = "audit_date";break;
+		              case "reviewDelivery": orderNode = "review_delivery";break;
+		            }
+
+
+		            Data.push( { "name": "state", "value": $('#salesOrderStateItems option:selected').val()});
+		            Data.push( { "name": "ordertime", "value": $.trim($('#ordertime').val())});
+		            Data.push( { "name": "reviewdelivery", "value": $.trim($('#reviewdelivery').val())});
+		            Data.push( { "name": "customerdelivery", "value": $.trim($('#customerdelivery').val())});
+		            Data.push( { "name": "ordernum", "value": $.trim($('#ordernum').val())});
+		            Data.push( { "name": "carnumber", "value": $.trim($('#carnumber').val())});
+		            Data.push( { "name": "peoplename", "value": $.trim($('#peoplename').val())});
+		            Data.push( { "name": "customername", "value": $.trim($('#customername').val())});
+		            Data.push( { "name": "orderType", "value": orderType});
+		            Data.push( { "name": "orderNode", "value": orderNode});
+		            $.ajax({
+		                "dataType" : 'json',
+		                "type" : "POST",
+		                "url":sSource,
+		                "data":Data,
+		                "success": fnCallback
+		            });
+		        },
+				//data : tableData,//可以直接给出数据
+				columns : colsDef
+
+			});
+				//全选    
+			$('#checkAll').click(function() {
+				$('[name=child]:checkbox').prop('checked', this.checked);
+			});
+				
+		},
+		error : function() {
+			swal(
+                    "请求失败",
+                    "error"
+                );
+		}
+	});
+	
+}
+function save(){
+	//选中所有数据行上的checkbox
+	var arry = $('input:checkbox[name=child]:checked');
+	//没有选中
+	if(arry.length == 0){
+		swal("请求至少选择一条");
+		return;
+	} 
+	var updateData = [];
+	//遍历所有
+	for(var i = 0; i < arry.length; i++){
+		var arr = arry[i].value.split(",");
+		var id = arr[0];
+		var xm = arr[1];
+		//var item = {};
+		var str = '{"student_id":"' +  id + '", "groupby_col":"' + xm + '",';
+		for(var k = 0; k < colsDef.length; k++){
+			//第一列是复选框不要
+			if(k == 0 || k == 1){
+				continue;
+			}
+			var key = colsDef[k].data;
+			var value = $("#" + key + "_" + id).val();
+			var jsonObj = '';
+			if(value){
+				jsonObj = str + '"col_key":"' + key + '", "col_value":"' +  value + '"}';
+			}else{
+				jsonObj = str + '"col_key":"' + key + '", "col_value":" "}';
+			}
+			updateData.push(JSON.parse(jsonObj));
+				//最后一列不加逗号不同
+				/* if(k + 1 ==  colsDef.length){
+					if(value){
+						str += '"' + key + '":"' +  value + '"}';
+					}else{
+						str += '"' + key + '":"' + '"}';
+					}
+				}else{
+					if(value){
+						str += '"' + key + '":"' +  value + '",';
+					}else{
+						str += '"' + key + '":"' + '",';
+					}
+				} */
+		}
+	}
+	//console.dir(updateData);
+	$.ajax({
+		url : "/test/save",//url
+		type : 'POST',
+		dataType: "json",
+		data : JSON.stringify(updateData),//{"dataList" : JSON.stringify(updateData)}
+		contentType: "application/json;charset=utf-8",
+		success : function(resdata) {
+			swal("保存成功");
+		}
+	})
+}
+/* function cancellCheckAll(obj){
+	//alert($('#checkAll').prop('checked'));
+	if($('#checkAll').prop('checked') && !obj.checked){
+		$('#checkAll').prop('checked', obj.checked);
+	}
+} */
+</script>
+</html>

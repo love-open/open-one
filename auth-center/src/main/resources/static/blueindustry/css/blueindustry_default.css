@@ -1,0 +1,89 @@
+.control-center .item{
+    border: 1px solid #D3D9E0;
+    background: #ffffff;
+    margin-bottom: 15px;
+}
+.control-center .name{
+    color: #324558;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 26px;
+}
+.control-center .tool{
+    height: 40px;
+    background: #F6F7F9;
+}
+.control-center .tool span{
+    width: 50%;
+    display: inline-block;
+    text-align: center;
+}
+.control-center .tool span a{
+    margin: 0 10px;
+    display: inline-block;
+    font-size: 12px;
+    color: #778592;
+    height: 22px;
+    line-height: 22px;
+    padding: 0 8px;
+    border-radius: 3px;
+    margin-top: 9px;
+}
+.control-center .tool span a:hover{
+    backgroundt:#306AE0;
+    background: linear-gradient(to right, #306AE0, #303BE0);;
+    cursor: pointer;
+    color: #ffffff;
+}
+.icon-lg{
+    width: 54px;
+    height: 54px;
+    margin: 0px auto;
+    background-position: center center;
+    background-size: auto auto;
+    background-repeat: no-repeat;
+    margin-top: 25px;
+    margin-bottom: 8px;
+}
+.icon-appdata{
+    background-image: url("../img/largeicons/icon-appdata.png");
+}
+.icon-customer{
+    background-image: url("../img/largeicons/icon-customer.png");
+}
+.icon-data{
+    background-image: url("../img/largeicons/icon-data.png");
+}
+.icon-development{
+    background-image: url("../img/largeicons/icon-development.png");
+}
+.icon-jurisdiction{
+    background-image: url("../img/largeicons/icon-jurisdiction.png");
+}
+.icon-line{
+    background-image: url("../img/largeicons/icon-line.png");
+}
+.icon-materiel{
+    background-image: url("../img/largeicons/icon-materiel.png");
+}
+.icon-order{
+    background-image: url("../img/largeicons/icon-order.png");
+}
+.icon-organization{
+    background-image: url("../img/largeicons/icon-organization.png");
+}
+.icon-plan{
+    background-image: url("../img/largeicons/icon-plan.png");
+}
+.icon-product{
+    background-image: url("../img/largeicons/icon-product.png");
+}
+.icon-set{
+    background-image: url("../img/largeicons/icon-set.png");
+}
+.icon-stock{
+    background-image: url("../img/largeicons/icon-order.png");
+}
+.icon-supplier{
+    background-image: url("../img/largeicons/icon-supplier.png");
+}

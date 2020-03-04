@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>登录</title>
+    <head th:replace="default/list_css::top"></head>
+    <link rel="stylesheet" th:href="@{/blueindustry/css/blueindustrylogin.css}">
+</head>
+<body>
+<h2 style="color:white;padding-left:56%;padding-top:3%"> 第一开源(OPEN-ONE)统一鉴权系统</h2>
+<div class="w1">
+    <div class="login-box" style="margin-top:100px">
+        <div class="login-box-body">
+            <ul class="nav-tabs" role="tablist" id="myTab">
+                <li role="presentation" class="active"><a href="#login" aria-controls="login" role="tab" data-toggle="tab" th:text="#{login_password_login}"></a></li>
+                <li role="presentation"><a href="#qrcode" aria-controls="profile" role="tab" data-toggle="tab" th:text="#{login_qrcode_login}"></a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="login">
+                    <form name="form" th:action="@{/api/v1/login}" method="post" id="loginForm">
+                        <div class="form-group has-feedback text-center">
+                            <p class="text-danger text-center" id="loginErrorInfo" style="visibility: hidden"></p>
+                            <!--<p th:if="${param.login_username_not_found}" class="text-danger text-center" th:text="#{login_username_not_found}"></p>
+                            <p th:if="${param.login_password_error}" class="text-danger text-center" th:text="#{login_password_error}"></p>
+                            <p th:if="${param.login_username_locked}" class="text-danger text-center" th:text="#{login_username_locked}"></p>
+                            <p th:if="${param.login_username_login_anothor_addr}" class="text-danger text-center" th:text="#{login_username_login_anothor_addr}"></p>
+                            <p th:if="${param.login_forbid_authorization}" class="text-danger text-center" th:text="#{login_forbid_authorization}"></p>
+                            <p th:if="${param.login_fail_error}" class="text-danger text-center" th:text="#{login_fail_error}"></p>-->
+                        </div>
+                        <div class="form-group has-feedback">
+                            <input name="username" id="username" type="text" class="form-control"  th:placeholder="#{login_username}" required/>
+                            <span class="icon-sm icon-sm-phone"></span>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <input name="password" id="password" type="password" class="form-control" th:placeholder="#{login_password}" required/>
+                            <span class="icon-sm icon-sm-password"></span>
+                        </div>
+                        <div class="form-group">
+                           <!-- <button type="submit" class="btn btn-primary btn-block btn-flat" th:text="#{login_login}"></button>-->
+                            <input type="button" class="btn btn-primary btn-block btn-flat" th:value="#{login_login}" onclick="login()"/>
+                        </div>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="qrcode">
+                    <div id="for_weixin_login" class="for_weixin_login_box"></div>
+                </div>
+            </div>
+            <div class="lang-box"><span><a href="/?lang=zh_CN" th:text="#{login_chinese}"></a></span><span><a href="/?lang=en_US" th:text="#{login_english}"></a></span></div>
+        </div><!-- /.login-box-body -->
+    </div><!-- /.login-box -->
+</div>
+<form id = "toIndex" action="/index" method="post">
+    <input type="hidden" name="token" id="token"/>
+</form>
+</body>
+<script th:src="@{/adminlte/js/jquery.min.js}"></script>
+<script th:src="@{/jquery-validation-1.19.0/dist/jquery.validate.min.js}"></script>
+<script th:src="@{/adminlte/js/jquery.base64.js}"></script>
+<script th:src="@{/js/my.js}"></script>
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $(function(){
+        $("#loginForm").validate({
+                highlight: function (e) {
+                    $(e).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (e) {
+                    $(e).closest('.form-group').removeClass('has-error');
+                },
+                submitHandler: function () {
+                    var password = $.trim($('#password').val());
+                    $('#password').val($.base64.encode(password));
+                    return true;
+                }
+            }
+        );
+        if("en_US" != request("lang")){
+            $(document.createElement("script")).attr("src", message_zh_min_url).appendTo("head");
+        }
+    });
+    /*]]>*/
+
+    function login() {
+        var user = {
+            username : $("#username").val(),
+            password : $("#password").val()
+        }
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/api/v1/login" ,//url
+            data: JSON.stringify(user),
+            contentType: "application/json;charset=UTF-8",
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.code == 200) {
+                    //alert(result.data.token);
+                    //window.location.href = "/index?token=" + "Bearer " + result.data.token;
+                    $("#token").val("Bearer " + result.data.token);
+                    $("#toIndex").submit();
+                }else{
+                    $("#loginErrorInfo").css("visibility", "visible")
+                    $("#loginErrorInfo").text(result.msg);
+                };
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+</script>
+</html>

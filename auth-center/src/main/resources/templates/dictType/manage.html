@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="default/list_css::top">
+    <style type="text/css">
+        th, td {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<section class="content-header">
+    <h1>
+        字典管理
+        <small>字典列表</small>
+    </h1>
+</section>
+
+<div class="modal fade" id="sysDictTypeModal" tabindex="-1" role="dialog" aria-labelledby="addUpModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="addUpModalLabel">
+                    字典信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" th:object="${sysDictType}" id="sysDictTypeUpdateForm"
+                      method="post">
+                    <input type="hidden" class="form-control m-input" th:field="*{id}" id="id">
+                    <div class="form-control-inline">
+
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span
+                                    style="color:red;">*</span>对照码</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{code}" id="code"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span
+                                    style="color:red;">*</span>对照值</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{value}" id="value"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span
+                                    style="color:red;">*</span>名称</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{name}" id="name"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="fa fa-reply btn btn-default" data-dismiss="modal"> 返回</button>
+                        <button type="submit" class="fa fa-save btn btn-info mr10"> 保存</button>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<!-- Main content -->
+<section class="content">
+    <div class="box box-warning">
+        <div class="box-header box-table-header">
+            <h3 class="box-title">
+            </h3>
+        </div>
+        <div class="box-header">
+            <h3 class="box-title">
+                <a href="#" class="btn btn-info mr10" onclick="addSysDictTypeBtn()"><i class="fa fa-plus"></i> 新增</a>
+                <a href="#" class="btn btn-info mr10" onclick="deleteSysDictTypeBtn()"><i class="fa fa-trash-o"></i> 删除</a>
+                <a href="#" class="btn btn-info mr10" onclick="updateSysDictTypeBtn()"><i class="fa fa-edit"></i> 修改</a>
+                <a href="#" class="btn btn-info mr10" onclick="queryBtn()"><i class="fa fa-search"></i> 查询</a>
+                <a href="#" class="btn btn-info mr10" onclick="resetBtn()"><i class="fa fa-repeat"></i> 重置</a>
+            </h3>
+        </div>
+        <div class="box-body table-responsive no-padding">
+            <table id="sysDictTypeList" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th class="center">
+                        <input type="checkbox" class="checkAll" id="checkAll"/>
+                    </th>
+                    <th>序号</th>
+                    <th>对照码</th>
+                    <th>对照值</th>
+                    <th>名称</th>
+
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td align="center">
+                        <input type="text" class="form-control form-control-xxs-dt " name="search" id="code_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                    <td align="center">
+                        <input type="text" class="form-control   form-control-xxs-dt" name="search" id="value_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                    <td align="center">
+                        <input type="text" class="form-control  form-control-xxs-dt" name="search" id="name_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+</section>
+<!-- /.content -->
+</body>
+<script th:replace="default/list_js::importjs"></script>
+<script type="text/javascript">
+    //供应商
+    var sysDictTypeTable;
+
+    var sId = $("input[name='ckb_id']:checked");
+    $(function () {
+        $("#sysDictTypeUpdateForm").validate({
+                highlight: function (e) {
+                    $(e).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (e) {
+                    $(e).closest('.form-group').removeClass('has-error');
+                }
+                ,
+                submitHandler: function () {
+                    addSysDictType();
+                }
+            }
+        );
+        loadDataTableData();
+        // listSysDictTypes();
+    });
+
+
+    $('#first').on('click', function () {
+        table.page('first').draw('page');
+    });
+
+    //加载表格数据
+    function loadDataTableData() {
+        sysDictTypeTable = $('#sysDictTypeList').DataTable({
+            "dom": '<"top">tlir<"datatable-footer"p><"clear">',
+            "aLengthMenu": [10, 25, 50, 100],
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            'bPaginate': true,
+            "bDestory": true,
+            "bRetrieve": true,
+            "bFilter": false,
+            "bSort": false,
+            "bProcessing": true,
+            "serverSide": true,
+            "fixedHeader": [{
+                header: true,
+            }],
+            "scrollY": yHeight - 425 + 'px',
+            "iDisplayLength": 10,
+            "columns": [
+                {
+                    "sClass": "text-center",
+                    "data": "id",
+                    "render": function (data, type) {
+                        return "<div align='center'><input type='checkbox' onclick = childclick() name='ckb_id' value='" + data + "'></div>";
+                    },
+                    "bSortable": false
+                },
+                {
+                    "data": null,
+                    render: function (data, type, row, meta) {
+                        // 显示行号,
+                        var startIndex = meta.settings._iDisplayStart;
+                        return (startIndex + meta.row + 1).toString();
+                    }
+                },
+
+                {"data": "code"},
+                {"data": "value"},
+                {"data": "name"}
+            ],
+            "ajax": {
+                type: "POST",
+                url: '/dictType/listSysDictTypes',
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+                data: function (d) {
+                    d.code = $.trim($('#code_input').val());
+                    d.value = $.trim($('#value_input').val());
+                    d.name = $.trim($('#name_input').val());
+                    return d;
+                }
+            },
+            "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                $(nRow).css("cursor", "pointer");
+            },
+            "oLanguage": {
+                "sProcessing": "努力加载中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有数据",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                }
+            }
+        })
+    }
+
+
+    //实现全选功能
+    $('#checkAll').on('click', function () {
+        if (this.checked) {
+            $(this).attr('checked', 'checked');
+            $("input[name='ckb_id']").each(function () {
+                this.checked = true;
+            });
+        } else {
+            $(this).removeAttr('checked');
+            $("input[name='ckb_id']").each(function () {
+                this.checked = false;
+            });
+        }
+    });
+
+    function childclick(id) {
+        if ($(this).is(":checked") == false) {
+            $("#checkAll").prop("checked", false);
+        }
+    }
+
+    //回车键绑定
+    $("input[name='search']").bind('keypress', function (event) {
+        if (event.keyCode == "13") {
+            sysDictTypeTable.ajax.reload();
+        }
+    });
+
+
+    //添加
+    function addSysDictType() {
+        var params = {
+            id: $.trim($('#id').val()),
+            code: $.trim($('#code').val()),
+            value: $.trim($('#value').val()),
+            name: $.trim($('#name').val())
+        };
+        $.ajax({
+            type: "post",
+            data: params,
+            url: "/dictType/addSysDictType",
+            dataType: "json",
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+            },
+            success: function (data) {
+                if (data.code) {
+                    swal('提示', data.msg, 'success');
+                    //刷新当前
+                    setTimeout(function () {
+                        history.go(0);
+                    }, 1000);
+                } else {
+                    swal('提示', data.msg, 'warning');
+                }
+            }
+        })
+    }
+
+    //显示添加Model
+    function addSysDictTypeBtn() {
+        //清空 文本框
+        $('.m-input').val('');
+        $('#sysDictTypeModal').modal('show');
+    };
+
+    //修改
+    function updateSysDictTypeBtn() {
+        //清空
+        $('.m-input').val('');
+        var checkedBox = $("input[name='ckb_id']:checked");
+        if (checkedBox.length != 1) {
+            swal('提示', '请选择一条记录，修改！', 'warning');
+            return;
+        }
+        var params = {
+            id: $('input[name="ckb_id"]:checked').val()
+        };
+        $.ajax({
+            url: '/dictType/getDictType',
+            data: params,
+            dataType: 'json',
+            type: "post",
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+            },
+            success: function (data) {
+                if (data) {
+                    // 1,提示
+                    if (data.code) {
+                        var sysDictType = data.sysDictType;
+                        $('#id').val(sysDictType.id);
+                        $('#code').val(sysDictType.code);
+                        $('#value').val(sysDictType.value);
+                        $('#name').val(sysDictType.name);
+                        $('#sysDictTypeModal').modal('show');
+                    } else {
+                        swal('提示', data.msg, 'warning');
+                    }
+                }
+            }
+        });
+    };
+
+    //删除
+    function deleteSysDictTypeBtn() {
+        var checkedBox = $("input[name='ckb_id']:checked");
+        if (checkedBox.length == 0) {
+            swal('提示', '至少选择一条记录，删除！', 'warning');
+            return;
+        }
+        var ids = [];
+        $('input[name="ckb_id"]:checked').each(function () {
+            ids.push($(this).val());
+        });
+        swal({
+            title: '警告',
+            text: '确定删除：' + ids.length + '条记录？',
+            type: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '确定！',
+            cancelButtonText: '取消！',
+        }).then(function (obj) {
+            if (obj.value) {
+                var params = {
+                    ids: ids
+                };
+                $.ajax({
+                    url: '/dictType/sysDictTypeDelete',
+                    dataType: 'json',
+                    type: "post",
+                    data: params,
+                    traditional: true,
+                    beforeSend: function(xhr, settings){
+                        xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                    },
+                    success: function (data) {
+                        if (data) {
+                            // 1,提示
+                            if (data.code) {
+                                swal('提示', data.msg, 'success');
+                                //刷新当前
+                                setTimeout(function () {
+                                    history.go(0);
+                                }, 1000);
+                            } else {
+                                swal('提示', data.msg, 'warning');
+                            }
+                        }
+                    }
+                });
+            }
+        })
+    };
+
+    //查询
+    function queryBtn() {
+        sysDictTypeTable.ajax.reload();
+    };
+
+    //重置
+    function resetBtn() {
+        $("input[name='search']").val('');
+        sysDictTypeTable.ajax.reload();
+    }
+</script>
+</html>

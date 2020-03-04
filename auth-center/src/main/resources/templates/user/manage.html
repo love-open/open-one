@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="default/list_css::top">
+    <style type="text/css">
+        th, td {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<section class="content-header">
+    <h1>
+        用户管理
+        <small>用户列表</small>
+    </h1>
+</section>
+<!-- 修改模态框（Modal） -->
+<div class="modal fade" id="addUsersModal" tabindex="-1" role="dialog" aria-labelledby="addUsersModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close refresh" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="addUsersModalLabel">
+                    用户信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" th:object="${sysUsers} " id="sysUsersUpdateForm"
+                      method="post">
+                    <input type="hidden" class="form-control m-input" th:field="*{id}" id="id">
+                    <div class="form-control-inline">
+                        <div class="form-group  m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>组织</label>
+                            <div class="col-lg-6">
+                                <!-- <select class="form-control" id="teamId">
+                                    <option style='display: none'></option>
+                                </select> -->
+                                <input type="text" class="form-control m-input" th:field="*{teamName}"
+                                       id="teamName"
+                                       required readOnly>
+                                <input type="hidden" class="form-control m-input" th:field="*{teamId}"
+                                       id="teamId">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>姓名</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{name}" id="name"
+                                       required disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>账号</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{username}"
+                                       id="username" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>密码</label>
+                            <div class="col-lg-6">
+                                <input type="password" class="form-control m-input" th:field="*{password}"
+                                       id="password">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label">主管部门</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" id="competentDepartmentName"
+                                       readOnly onclick="ejectDepartmentTree();">
+                                <input type="hidden" class="form-control m-input" id="competentDepartmentCode">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group  m-form__group row">
+                            <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>电话</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{tel}" id="tel"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group  m-form__group row">
+                            <label class="col-lg-3 col-form-label">邮箱</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{email}" id="email">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label">锁定标志</label>
+                            <div class="col-lg-6">
+                                <select class="form-control" name="search" id="lockFlag">
+                                    <option style='display: none'></option>
+                                    <option value="0">否</option>
+                                    <option value="1">是</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-control-inline">
+                        <div class="form-group m-form__group row">
+                            <label class="col-lg-3 col-form-label">备注</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control m-input" th:field="*{remark}"
+                                       id="remark">
+                            </div>
+                        </div>
+                    </div>
+                    <!--分割线-->
+                    <h1 class="form-sub-ttl"></h1>
+                    <h2></h2>
+                    <div class="box-body">
+                        <div id="RoleTree"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="fa fa-reply refresh btn btn-default" data-dismiss="modal"> 返回
+                        </button>
+                        <button type="submit" class="fa fa-save btn btn-info mr10"> 保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 选择组织机构（Modal） -->
+<div class="modal fade" id="orgModel" tabindex="-1" role="dialog" aria-labelledby="addUsersModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title">选择组织结构及人员</h4>
+            </div>
+            <div class="modal-body-auto">
+                <div class="search-list-box">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="tree-box">
+                                <div id="organizationTree"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="list-box">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="employeeName" id="employeeName"
+                                           class="form-control pull-right" placeholder="输入关键字">
+                                    <div class="input-group-btn">
+                                        <button type="submit" class="btn btn-default" id="searchEmployee"><i
+                                                class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="list-check">
+                                    <ul id="employList">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="fa fa-reply btn btn-default" data-dismiss="modal"> 返回</button>
+                <button type="button" id="confirmEmp" class="fa fa-save btn btn-info mr10" data-dismiss="modal"> 保存
+                </button>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<!-- 选择主管部门(Modal) -->
+<div class="modal fade" id="departmentModel" tabindex="-1" role="dialog"
+     aria-labelledby="addDepartmentModelLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title">选择组织结构</h4>
+            </div>
+            <div class="box-body">
+                <div id="departmentTree"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="fa fa-reply btn btn-default" data-dismiss="modal"> 返回</button>
+                <button type="button" id="confirmDepartment" class="fa fa-save btn btn-info mr10" data-dismiss="modal">
+                    保存
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<!-- Main content -->
+<section class="content">
+    <div class="box box-warning">
+        <div class="box-header box-table-header">
+            <h3 class="box-title">
+            </h3>
+        </div>
+        <div class="box-header">
+            <h3 class="box-title">
+                <a href="#" class="btn btn-info mr10" onclick="addSysUsersBtn()"><i class="fa fa-plus"></i> 新增</a>
+                <a href="#" class="btn btn-info mr10" onclick="deleteSysUsersBtn()"><i class="fa fa-trash-o"></i> 删除</a>
+                <a href="#" class="btn btn-info mr10" onclick="updateSysUsersBtn()"><i class="fa fa-edit"></i> 修改</a>
+                <a href="#" class="btn btn-info mr10" onclick="queryBtn()"><i class="fa fa-search"></i> 查询</a>
+                <a href="#" class="btn btn-info mr10" onclick="resetBtn()"><i class="fa fa-repeat"></i> 重置</a>
+            </h3>
+        </div>
+        <div class="box-body table-responsive no-padding">
+            <table id="sysUsersList" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th class="center">
+                        <input type="checkbox" class="checkAll" id="checkAll"/>
+                    </th>
+                    <th>序号</th>
+                    <th>姓名</th>
+                    <th>账号</th>
+                    <th>组织</th>
+                    <th>电话</th>
+                    <th>邮箱</th>
+                    <th>最后登录时间</th>
+                    <th>最后登录ip</th>
+                    <th>在线标志</th>
+                    <th>锁定标志</th>
+                    <th>微信昵称</th>
+                    <th>备注</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td align="center">
+                        <input type="text" class="form-control form-control-sm form-control-xxs "
+                               name="search"
+                               id="name_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm form-control-xxs "
+                               name="search"
+                               id="account_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm form-control-xxs "
+                               name="search"
+                               id="teamName_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <select class="form-control form-control-sm form-control-xxs " name="search"
+                                id="onlineFlag_input">
+                            <option style='display: none'></option>
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control form-control-sm form-control-xxs " name="search"
+                                id="lockFlag_input">
+                            <option style='display: none'></option>
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm form-control-xxs "
+                               name="search"
+                               id="wechatNickname_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm form-control-xxs "
+                               name="search"
+                               id="remark_input"
+                               placeholder="模糊查询"/>
+                    </td>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+</section>
+<!-- /.content -->
+</body>
+<script th:replace="default/list_js::importjs"></script>
+<script type="text/javascript">
+    //供应商
+    var sysUsersTable;
+
+    //Tree
+    //选择节点Id
+    var selectedId = 'root';
+    //选择节点Name
+    var selectedName = '';
+    //修改标志  0:新增   1:修改
+    var updateFlag = '';
+
+    var sId = $("input[name='ckb_id']:checked");
+    $(function () {
+        $("#sysUsersUpdateForm").validate({
+                highlight: function (e) {
+                    $(e).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (e) {
+                    $(e).closest('.form-group').removeClass('has-error');
+                }
+                ,
+                submitHandler: function () {
+                    addSysUsers();
+                }
+            }
+        );
+        loadDataTableData();
+    });
+
+    //加载用户分组tree
+    $('#RoleTree').jstree({
+        'core': {
+            "check_callback": true,
+            'data': {
+                'url': '/role/getTree?hasChildrenNodeFlag=1',
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                }
+            },
+        },
+        "plugins": ["checkbox"],
+        "checkbox": {
+            //是否默认选中
+            "keep_selected_style": false,
+        },
+    })
+    // 展开用户单所有节点
+        .on("loaded.jstree", function (event, data) {
+            $('#RoleTree').jstree('open_all');
+        })
+        //获得用户点击节点的id
+        .on("changed.jstree", function (e, data) {
+            // 获取当前菜单节点下的目录列表
+            selectedId = data.node.id;
+            selectedName = data.node.text;
+
+        });
+
+
+    //加载表格数据
+    function loadDataTableData() {
+        sysUsersTable = $('#sysUsersList').DataTable({
+            "dom": '<"top">tlir<"datatable-footer"p><"clear">',
+            "aLengthMenu": [10, 25, 50, 100],
+            "bAutoWidth": false,
+            'bPaginate': true,
+            "bDestory": true,
+            "bRetrieve": true,
+            "bFilter": false,
+            "bSort": false,
+            "bProcessing": true,
+            "scrollX": true,
+            "serverSide": true,
+            "fixedHeader": [{
+                header: true,
+            }],
+            "scrollY": yHeight - 425 + 'px',
+            "iDisplayLength": 10,
+            "columns": [
+                {
+                    "sClass": "text-center",
+                    "data": "id",
+                    "render": function (data, type) {
+                        return "<div align='center'><input type='checkbox' onclick = childclick() name='ckb_id' value='" + data + "'></div>";
+                    },
+                    "bSortable": false
+                },
+                {
+                    "data": null,
+                    render: function (data, type, row, meta) {
+                        // 显示行号,
+                        var startIndex = meta.settings._iDisplayStart;
+                        return (startIndex + meta.row + 1).toString();
+                    }
+                },
+
+                {"data": "name"},
+                {"data": "username"},
+                {"data": "teamName"},
+                {"data": "tel"},
+                {"data": "email"},
+                {"data": "lastLoginTime"},
+                {"data": "lastLoginIp"},
+                {
+                    "data": "onlineFlag",
+                    "render": function (data, type, row, meta) {
+                        if ("1" == data) {
+                            return "是";
+                        } else {
+                            return "否";
+                        }
+                    }
+                },
+                {
+                    "data": "lockFlag",
+                    "render": function (data, type, row, meta) {
+                        if ("1" == data) {
+                            return "是";
+                        } else {
+                            return "否";
+                        }
+                    }
+                },
+                {"data": "wechatNickname"},
+                {"data": "remark"}
+            ],
+            "ajax": {
+                type: "POST",
+                beforeSend: function(xhr, settings){
+                    		    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                    		},
+                url: '/user/listSysUsers',
+                data: function (d) {
+                    d.name = $.trim($('#name_input').val());
+                    d.username = $.trim($('#account_input').val());
+                    d.teamName = $.trim($('#teamName_input').val());
+                    d.onlineFlag = $.trim($('#onlineFlag_input').val());
+                    d.lockFlag = $.trim($('#lockFlag_input').val());
+                    d.wechatNickname = $.trim($('#wechatNickname_input').val());
+                    d.remark = $.trim($('#remark_input').val());
+                    return d;
+                }
+            },
+            "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                $(nRow).css("cursor", "pointer");
+            },
+            "oLanguage": {
+                "sProcessing": "努力加载中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有数据",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                }
+            }
+        })
+    }
+
+
+    //添加
+    function addSysUsers() {
+        var teamId = $.trim($('#teamId').val());
+        var username = $.trim($('#username').val());
+        if (!teamId) {
+            swal('提示', '请选择组织！', 'warning');
+            return;
+        }
+        if ("admin" == username.toLowerCase()) {
+            swal('提示', '不允许为admin账号！', 'warning');
+            return;
+        }
+        //表单参数
+        var params = {};
+        if (updateFlag == '0') {
+            params = {
+                teamId: teamId,
+                teamName: $.trim($('#teamName').val()),
+                name: $.trim($('#name').val()),
+                username: username,
+                password: $.trim($('#password').val()),
+                tel: $.trim($('#tel').val()),
+                email: $.trim($('#email').val()),
+                lockFlag: $.trim($('#lockFlag').val()),
+                remark: $.trim($('#remark').val()),
+                competentDepartmentCode: $.trim($('#competentDepartmentCode').val()),
+                competentDepartmentName: $.trim($('#competentDepartmentName').val()),
+            }
+        } else {
+            params = {
+                id: $('input[name="ckb_id"]:checked').val(),
+                teamId: teamId,
+                teamName: $.trim($('#teamName').val()),
+                name: $.trim($('#name').val()),
+                username: username,
+                password: $.trim($('#password').val()),
+                tel: $.trim($('#tel').val()),
+                email: $.trim($('#email').val()),
+                lockFlag: $.trim($('#lockFlag').val()),
+                remark: $.trim($('#remark').val()),
+                competentDepartmentCode: $.trim($('#competentDepartmentCode').val()),
+                competentDepartmentName: $.trim($('#competentDepartmentName').val()),
+            }
+
+        }
+
+        //遍历选中节点
+        var sysRoleIds = [];
+        var sysRoles = $('#RoleTree').jstree("get_selected", true);
+        $.each(sysRoles, function () {
+            if (!$('#RoleTree').jstree('is_parent', this.id)) {
+                sysRoleIds.push(this.id);
+            }
+
+        });
+        $.ajax({
+            type: "post",
+            data: params,
+            url: "/user/addSysUsers?sysRoleIds=" + sysRoleIds,
+            traditional: true,
+            dataType: "json",
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+            },
+            success: function (data) {
+                if (data.code) {
+                    swal('提示', data.msg, 'success');
+                    //清空模态框
+                    clearModel();
+                    //刷新当前
+                    setTimeout(function () {
+                        history.go(0);
+                    }, 1000);
+                } else {
+                    swal('提示', data.msg, 'warning');
+                }
+            }
+        })
+    }
+
+    //添加
+    function addSysUsersBtn() {
+        updateFlag = '0';
+        //清空 文本框
+        $('.m-input').val('');
+        //组织
+        //$("#teamId")[0].options.selectedIndex = 0;
+        $("#lockFlag")[0].options.selectedIndex = 0;
+        $('#password').prop("required", true);
+
+        $('#addUsersModal').modal('show');
+    };
+
+
+    //修改
+    function updateSysUsersBtn() {
+        updateFlag = '1';
+        //清空 文本框
+        $('.m-input').val('');
+        //组织
+        //$("#teamId")[0].options.selectedIndex = 0;
+        $("#lockFlag")[0].options.selectedIndex = 0;
+
+        $('#password').prop("required", false);
+        var checkedBox = $("input[name='ckb_id']:checked");
+        if (checkedBox.length != 1) {
+            swal('提示', '请选择一条记录，修改！', 'warning');
+            return;
+        }
+        var params = {
+            id: $('input[name="ckb_id"]:checked').val(),
+        };
+        //遍历选中节点
+        var sysRoleIds = [];
+        var sysRoles = $('#RoleTree').jstree("get_selected", true);
+        $.each(sysRoles, function () {
+            sysRoleIds.push(this.id);
+        });
+        $.ajax({
+            url: '/user/getUsers',
+            data: params,
+            dataType: 'json',
+            type: "post",
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+            },
+            success: function (data) {
+                if (data) {
+                    if (data.code) {
+                        var sysUsers = data.sysUsers;
+                        $('#id').val(sysUsers.id);
+                        $('#teamId').val(sysUsers.teamId);
+                        $('#teamName').val(sysUsers.teamName);
+                        $('#name').val(sysUsers.name);
+                        $('#username').val(sysUsers.username);
+                        $('#tel').val(sysUsers.tel);
+                        $('#email').val(sysUsers.email);
+                        if (sysUsers.lockFlag) {
+                            $('#lockFlag').val('1');
+                        } else {
+                            $('#lockFlag').val('0');
+                        }
+                        $('#remark').val(sysUsers.remark);
+                        $('#competentDepartmentCode').val(sysUsers.competentDepartmentCode);
+                        $('#competentDepartmentName').val(sysUsers.competentDepartmentName);
+                        //勾选关联菜单RoleId
+                        if (data.checkedRoleIds) {
+                            for (var i = 0; i < data.checkedRoleIds.length; i++) {
+                                $('#RoleTree').jstree('select_node', data.checkedRoleIds[i]);
+                            }
+                        }
+                        $('#addUsersModal').modal('show');
+                    } else {
+                        swal('提示', data.msg, 'warning');
+                    }
+                }
+
+            }
+        });
+    };
+
+    //删除
+    function deleteSysUsersBtn() {
+        var checkedBox = $("input[name='ckb_id']:checked");
+        if (checkedBox.length == 0) {
+            swal('提示', '至少选择一条记录，删除！', 'warning');
+            return;
+        }
+        var ids = [];
+        $('input[name="ckb_id"]:checked').each(function () {
+            ids.push($(this).val());
+        });
+        swal({
+            title: '警告',
+            text: '确定删除：' + ids.length + '条记录？',
+            type: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '确定！',
+            cancelButtonText: '取消！',
+        }).then(function (obj) {
+            if (obj.value) {
+                var params = {
+                    ids: ids
+                };
+                $.ajax({
+                    url: '/user/deleteUsers',
+                    dataType: 'json',
+                    type: "post",
+                    data: params,
+                    traditional: true,
+                    beforeSend: function(xhr, settings){
+                        xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                    },
+                    success: function (data) {
+                        if (data) {
+                            // 1,提示
+                            if (data.code) {
+                                swal('提示', data.msg, 'success');
+                                // //刷新当前
+                                setTimeout(function () {
+                                    history.go(0);
+                                }, 1000);
+                            } else {
+                                swal('提示', data.msg, 'warning');
+                            }
+                        }
+                    }
+                });
+            }
+        })
+    };
+
+    $("#teamName").click(function () {
+        $('#orgModel').modal('show');
+    });
+
+    //查询
+    function queryBtn() {
+        sysUsersTable.ajax.reload();
+    };
+
+    //重置
+    function resetBtn() {
+        $("input[name='search']").val('');
+        $("#onlineFlag_input")[0].options.selectedIndex = 0;
+        $("#lockFlag_input")[0].options.selectedIndex = 0;
+
+        sysUsersTable.ajax.reload();
+    };
+    //实现全选功能
+    $('#checkAll').on('click', function () {
+        if (this.checked) {
+            $(this).attr('checked', 'checked');
+            $("input[name='ckb_id']").each(function () {
+                this.checked = true;
+            });
+        } else {
+            $(this).removeAttr('checked');
+            $("input[name='ckb_id']").each(function () {
+                this.checked = false;
+            });
+        }
+    });
+
+    function childclick(id) {
+        if ($(this).is(":checked") == false) {
+            $("#checkAll").prop("checked", false);
+        }
+    }
+
+    //回车键绑定
+    $("input[name='search']").bind('keypress', function (event) {
+        if (event.keyCode == "13") {
+            sysUsersTable.ajax.reload();
+        }
+    });
+    //关闭刷新当前页面
+    $(function () {
+        $(".refresh").click(function () {
+            //清空模态框
+            clearModel();
+
+            //location ="/user/manage";
+            sysUsersTable.ajax.reload();
+        })
+    });
+
+    //清空模态框
+    function clearModel() {
+        //清空文本框
+        $('.m-input').val('');
+        //清空角色树
+        /* var selectedRoles = $('#RoleTree').jstree("get_selected", true);
+        $.each(selectedRoles, function(){
+        	$('#RoleTree').jstree('check_node', $(this).id, false);
+        });  */
+        //取消选中
+        $("#RoleTree").jstree("deselect_all", true);
+        $("#departmentTree").jstree("deselect_all", true);
+        //取消展开
+        $('#departmentTree').jstree('close_all');
+        //取消验证失败提示文字变红的样式
+        $(".has-error").each(function () {
+            $(this).removeClass("has-error");
+        });
+        //取消验证失败下面的提示文字
+        $(".error").each(function () {
+            $(this).remove();
+        })
+    }
+
+    //加载组织机构树
+    $('#organizationTree').jstree({
+        'core': {
+            'data': {
+                'url': '/user/loadDepartmentsTree',
+                'type': 'post',
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+                'data': function (node) {
+                    return {'id': node.id};
+                }
+            },
+        }
+    })
+    // 展开所有节点
+    // .on("loaded.jstree", function (event, data) {
+    //     $('#organizationTree').jstree('open_all');
+    // })
+    //获得点击节点的id
+        .on("changed.jstree", function (e, data) {
+            var text = data.instance.get_node(data.selected[0]).text;
+            var departmentId = data.instance.get_node(data.selected[0]).id;
+            // 获取当前节点下的目录列表
+            loadEmployee(departmentId);
+        });
+
+    function loadEmployee(departmentId, name) {
+        $.ajax({
+            type: "post",
+            data: {
+                departmentId: departmentId,
+                name: name
+            },
+            url: "/user/loadEmployeeByDepart",
+            dataType: "json",
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+            },
+            success: function (data) {
+                if (data) {
+                    var html = "";
+                    for (var i = 0; i < data.length; i++) {
+                        html += '<li><label><input name="employee" type="radio" value="' + data[i].userId + '">' + data[i].name + '<span class="bg"></span></label></li>';
+                    }
+                    $("#employList").text("");// 清空数据
+                    $("#employList").append(html);
+                    //刷新当前
+                } else {
+                    swal('提示', data.msg, 'warning');
+                }
+            }
+        });
+    }
+
+
+    //查询员工信息
+    $('#searchEmployee').click(function () {
+        loadEmployee(1, $("#employeeName").val());
+    });
+
+    //确认员工信息
+    $('#confirmEmp').click(function () {
+        var userId = $('input[name="employee"]:checked').val();
+        $.ajax({
+            type: "post",
+            data: {
+                userId: userId,
+            },
+            url: "/user/selectEmpNameAndDepartName",
+            dataType: "json",
+            beforeSend: function(xhr, settings){
+                xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+            },
+            success: function (data) {
+                if (data) {
+                    $("#teamId").val(data.departmentId);
+                    $("#teamName").val(data.departmentName);
+                    $("#name").val(data.name);
+                    $("#id").val(data.userId);
+                    //刷新当前
+                } else {
+                    swal('提示', data.msg, 'warning');
+                }
+            }
+        });
+    });
+
+    //加载部门树
+    $('#departmentTree').jstree({
+        'core': {
+            "check_callback": true,
+            'data': {
+                'url': '/user/loadDepartmentsTree',
+                'type': 'post',
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+            },
+        },
+        "plugins": ["checkbox"],
+        "checkbox": {
+            //是否默认选中
+            "keep_selected_style": false,
+        },
+    })
+    // 展开用户单所有节点
+        .on("loaded.jstree", function (event, data) {
+            //$('#departmentTree').jstree('open_all');
+        })
+        //获得用户点击节点的id
+        .on("changed.jstree", function (e, data) {
+            // 获取当前菜单节点下的目录列表
+            selectedId = data.node.id;
+            selectedName = data.node.text;
+
+        });
+
+    function ejectDepartmentTree() {
+        var competentDepartmentCodes = $("#competentDepartmentCode").val().split(',');
+        for (var i = 0; i < competentDepartmentCodes.length; i++) {
+            $('#departmentTree').jstree('select_node', competentDepartmentCodes[i]);
+        }
+
+        $('#departmentModel').modal('show');
+    }
+
+    //确认部门信息
+    $('#confirmDepartment').click(function () {
+        var userId = $('input[name="employee"]:checked').val();
+        var departments = $('#departmentTree').jstree("get_selected", true);
+        var competentDepartmentName = [];
+        var competentDepartmentCode = [];
+        for (var i = 0; i < departments.length; i++) {
+            competentDepartmentName.push(departments[i].text);
+            competentDepartmentCode.push(departments[i].id);
+        }
+        $("#competentDepartmentName").val(competentDepartmentName);
+        $("#competentDepartmentCode").val(competentDepartmentCode);
+    })
+
+</script>
+</html>

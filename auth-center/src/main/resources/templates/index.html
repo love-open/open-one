@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="default/list_css::top">
+<style type="text/css">
+        th, td {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<!-- Site wrapper -->
+<div class="wrapper">
+    <header class="main-header" th:fragment="header">
+	    <!-- Logo -->
+	    <a href="#" class="logo">
+	        <!-- mini logo for sidebar mini 50x50 pixels -->
+	        <!-- logo for regular state and mobile devices -->
+	        <span class="logo-lg"><b>OPEN-ONE</b></span>
+	    </a>
+	    <!-- Header Navbar -->
+	    <nav class="navbar navbar-static-top" role="navigation">
+	        <!-- Sidebar toggle button-->
+	        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+	            <span class="sr-only">Toggle navigation</span>
+	        </a>
+	        <!-- Navbar Right Menu -->
+	        <div class="navbar-custom-menu">
+	            <ul class="nav navbar-nav">
+<!--	                <span sec:authentication="name" hidden id="curAccount"></span>-->
+	                <li role="presentation" class="dropdown user-menu">
+	                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);" title="账号信息" onclick="editCurAccount()" role="button" aria-haspopup="true" aria-expanded="false" id="currentUser">
+	                        <img th:src="@{/blueindustry/img/user-25x25.jpg}" class="user-image" alt="User Image" >
+	                    </a>
+	                </li>
+	                <li>
+	                    <a href="javascript:void(0);" onclick="toLogout()">注销</a>
+	                </li>
+					<!-- 国际化-->
+	                <!--<li role="presentation" class="dropdown">
+	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+	                        	语言 <span class="caret"></span>
+	                    </a>
+	                    <ul class="dropdown-menu">
+	                        <li><a href='javascript:void(0);' onclick=setLang('zh_CN')> 中文</a></li>
+	                        <li><a href='javascript:void(0);' onclick=setLang('en_US')>English</a></li>
+	                    </ul>
+	                </li>-->
+	            </ul>
+	        </div>
+	        <!-- 编辑账号模态框（Modal） -->
+	        <div class="modal fade" id="editCurAccountModal" role="dialog"  aria-hidden="true" data-backdrop="false">
+	            <div class="modal-dialog">
+					<!--<img src="../../../../../../../../Users/Mac/AppData/Local/Temp/QzpcVXNlcnNcTWFjXEFwcERhdGFcUm9hbWluZ1xEaW5nVGFsa1xkZWZFbW90aW9uXGVtb3Rpb25fMDAyLnBuZw==.png"/>-->
+					<div class="modal-content">
+	                    <div class="modal-header">
+	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                            &times;
+	                        </button>
+	                        <h4 class="modal-title">用户信息</h4>
+	                    </div>
+	                    <div class="modal-body">
+	                        <form class="form-horizontal" role="form" id="editCurAccountForm"
+	                              method="post">
+	                            <input type="hidden" class="form-control m-input" id="editCurAccountId">
+	                            <div class="form-control-inline">
+	                                <div class="form-group m-form__group row">
+	                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>账号</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="text" class="form-control m-input"
+	                                               id="editCurAccountAccount" required disabled="disabled">
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="form-control-inline">
+	                                <div class="form-group m-form__group row">
+	                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>姓名</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="text" class="form-control m-input"  id="editCurAccountName"
+	                                               required>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="form-control-inline">
+	                                <div class="form-group  m-form__group row">
+	                                    <label class="col-lg-3 col-form-label">电话</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="text" class="form-control m-input" id="editCurAccountTel">
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="form-control-inline">
+	                                <div class="form-group  m-form__group row">
+	                                    <label class="col-lg-3 col-form-label">邮箱</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="text" class="form-control m-input" id="editCurAccountEmail">
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="modal-footer">
+	                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	                                <button type="submit" class="btn btn-primary">保存</button>
+	                                <button type="button" class="btn btn-warning" id="updatePwdBtn">修改密码</button>
+	                            </div>
+	                        </form>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	        <!-- 修改密码Modal -->
+	        <div class="modal fade" id="updatePwdModal" role="dialog"  aria-hidden="true" data-backdrop="false">
+	            <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-header">
+	                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                            &times;
+	                        </button>
+	                        <h4 class="modal-title"> 修改密码</h4>
+	                    </div>
+	                    <div class="modal-body">
+	                        <form class="form-horizontal" role="form" id="updatePwdForm" method="post">
+	                            <div class="form-control-inline">
+	                                <div class="form-group m-form__group row">
+	                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>原密码</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="password" class="form-control m-input"
+	                                               id="oldPassword" required>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="form-control-inline">
+	                                <div class="form-group m-form__group row">
+	                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>新密码</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="password" class="form-control m-input"  id="newPassword"
+	                                               required>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="form-control-inline">
+	                                <div class="form-group m-form__group row">
+	                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>确认新密码</label>
+	                                    <div class="col-lg-6">
+	                                        <input type="password" class="form-control m-input"  id="confirmPassword"
+	                                               required>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="modal-footer">
+	                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	                                <button type="submit" class="btn btn-primary">保存</button>
+	                            </div>
+	                        </form>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </nav>
+	
+	</header>
+    <!-- =============================================== -->
+    <!-- Left side column. contains the sidebar -->
+    <aside class="main-sidebar">
+	    <section class="sidebar">
+	        <!-- Sidebar Menu -->
+	        <!-- <ul class="sidebar-menu" data-widget="tree">
+	            <li class="treeview active">
+	                <a href="#"><i class="icon-sm icon-sm-data"></i> <span>测试模块</span>
+	                    <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+	                </a>
+	                <ul class="treeview-menu">
+	               	    <li><a href="#;" ref='/test/totesttable1'>动态表头</a></li>
+	                </ul>
+	            </li>
+	            
+	            <li class="treeview">
+	                <a href="#"><i class="icon-sm icon-sm-data"></i> <span>系统管理</span>
+	                    <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+	                </a>
+	                <ul class="treeview-menu">
+	                    <li><a href="#;" ref='/user/manage'>用户管理</a></li>
+	                    <li><a href="#;" ref='/dictType/manage'>字典管理</a></li>
+	                </ul>
+	           </li>
+	        </ul> -->
+	        <!-- /.sidebar-menu -->
+	    </section>
+	    <!-- /.sidebar -->
+	</aside>
+    <!-- =============================================== -->
+    <!-- Content Wrapper. Contains page content -->
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <iframe src="" id="myiframe" frameborder="0" width="100%" height="100%">
+
+      </iframe>
+    </div>
+    <!-- /.content-wrapper -->
+    <div th:replace="default/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+</body>
+<script th:replace="default/list_js::importjs"> </script>
+<!-- page script -->
+<script th:inline="javascript">
+
+//用户详情对象
+var sysUsersView = [[${sysUsersView}]];
+
+$(function(){
+	/**
+	 * 先初始化菜单
+	 * */
+	initializationMenu(sysUsersView);
+	/**
+	 * 设置iframe的高度
+	 * */
+	//取左边菜单栏边框的高度
+	var sidebarHeight = parseInt($(".sidebar").css("height").replace(/[^0-9]/ig, ""));
+	//页眉的高度
+	var headerHeight = $(".main-header").height();
+	//console.log(headerHeight);
+	//页脚的高度
+	var footerHeight = $(".main-footer").height();
+	//console.log(footerHeight);
+	//浏览器当前窗口的高度
+	var windowHeight = $(window).height();
+	//console.log(windowHeight);
+	//当前剩余高度
+	var surplusHeight = windowHeight - headerHeight - 61;
+	//console.log(surplusHeight);
+	if(surplusHeight > sidebarHeight){
+		$("#myiframe").css("height", surplusHeight + "px");
+	}else{
+		$("#myiframe").css("height", sidebarHeight + "px");
+	}
+	/**
+	 * 添加叶子节点点击事件，触发iframe
+	 * */
+    $('.treeview-menu li a').click(function(){
+    	var ref = $(this).attr("ref");
+    	//特殊处理工控机
+    	if(ref == '/ipc/ipcindex'){
+    		window.location.href  = '/ipc/ipcindex';
+    	}
+        $("#myiframe").attr('src', $(this).attr("ref"));
+    });
+
+	/**
+	 * 添加点击收缩时间
+	 * */
+	$(".treeview>a").click(function () {
+		//其它兄弟姐妹节点下的子菜单收起
+		$(this).parent().siblings().find(".treeview-menu").slideUp();
+		//切换子菜单滑动切换
+		$(this).parent().find(".treeview-menu").slideToggle();
+	})
+})
+/**
+ * 页面加载后初始化菜单
+ */
+function initializationMenu(sysUsersView){
+	var menuArr = sysUsersView.sysMenus;
+	//写死了数据做测试
+	/* var menus = [
+				 {"blockName":"基础功能","childrens":[
+					 							   {"name":"用户管理","url":"/user/manage"},
+					 							   {"name":"角色管理","url":"/role/manage"},
+					 							   {"name":"菜单管理","url":"/menu/manage"},
+					 							   {"name":"字典管理","url":"/dictType/manage"}
+					 							  ]
+				 },
+		         {"blockName":"测试模块","childrens":[{"name":"动态表头","url":"/test/totesttable1"}]}
+				];  */
+	//解析成有结构的数组
+	var menus = [];
+	for(var i = 0; i < menuArr.length; i++){
+		var menu = menuArr[i];
+		var parentMenuId1 = menuArr[i].parentMenuId;
+		if(parentMenuId1 == 'root'){//判断是目录
+			var parentId = menuArr[i].id;
+			var block = {};
+			block.blockName = menu.name;
+			var childrens = [];
+			for(var j = 0; j < menuArr.length; j++){
+				var parentMenuId2 = menuArr[j].parentMenuId;
+				if(parentMenuId2 == parentId){
+					var children = {};
+					children.name =  menuArr[j].name;
+					children.url =  menuArr[j].url;
+					childrens.push(children);
+				}
+			}
+			block.childrens = childrens;
+			menus.push(block);
+		}
+	} 
+	//生成html
+	var htmlStr = "<ul class='sidebar-menu' data-widget='tree'>";
+	debugger
+	for(var i = 0; i < menus.length; i++){
+		//默认展开第一个
+		if(i == 0){
+			var parentStr = "<li class='treeview active menu-open'>"
+					+	  "<a href='#;'><i class='icon-sm icon-sm-data'></i> <span>" + menus[i].blockName + "</span>"
+					+     "<span class='pull-right-container'><i class='fa fa-angle-left pull-right'></i></span>"
+					+   "</a>";
+			var childrenStr = "<ul class='treeview-menu'>";
+			var children = menus[i].childrens;
+			for(var k = 0; k < children.length; k++){
+				childrenStr += "<li><a href='#;' ref='" + children[k].url + "'>" + children[k].name +  "</a></li>"
+			}
+			childrenStr += "</ul>";
+			parentStr += childrenStr;
+			parentStr += "</li>";
+			htmlStr += parentStr;
+		}else{
+			var parentStr = "<li class='treeview active'>"
+					+	  "<a href='#;'><i class='icon-sm icon-sm-data'></i> <span>" + menus[i].blockName + "</span>"
+					+     "<span class='pull-right-container'><i class='fa fa-angle-left pull-right'></i></span>"
+					+   "</a>";
+			var childrenStr = "<ul class='treeview-menu' style='display: none;'>";
+			var children = menus[i].childrens;
+			for(var k = 0; k < children.length; k++){
+				childrenStr += "<li><a href='#;' ref='" + children[k].url + "'>" + children[k].name +  "</a></li>"
+			}
+			childrenStr += "</ul>";
+			parentStr += childrenStr;
+			parentStr += "</li>";
+			htmlStr += parentStr;
+		}
+	}
+	htmlStr += "</ul>";
+	$(".sidebar").html(htmlStr);
+	//设置默认菜单(默认第一个)
+	if(menus.length > 0){
+		//处理班组长,直接跳工控机页面
+		var roles = sysUsersView.sysRoles;
+		for(var i = 0; i < roles.length; i++){
+			var uniqueId = roles[i].uniqueId;
+			if(uniqueId == 'TL'){
+				window.location.href  = '/ipc/ipcindex/page';
+			}
+		}
+		// $.ajax({
+		// 	type: "GET",
+		// 	url: menus[0].childrens[0].url,
+		// 	contentType: "application/json",
+		// 	beforeSend: function(xhr, settings){
+		// 		xhr.setRequestHeader("Authorization", sysUsersView.token);},
+		// 	success: function(data){
+		// 		$("#myiframe").attr('src',"data:text/html;charset=utf-8," + escape(data))
+		// 	}
+		// });
+		$("#myiframe").attr('src', menus[0].childrens[0].url);
+	}
+}
+
+function toLogout(){
+	$.ajax({
+		//几个参数需要注意一下
+		type: "GET",//方法类型
+		dataType: "json",//预期服务器返回的数据类型
+		url: "/api/v1/logout" ,//url
+		data: "",
+		contentType: "application/json;charset=UTF-8",
+		beforeSend: function(xhr, settings){
+			xhr.setRequestHeader("Authorization",  sysUsersView.token);
+		},
+		success: function (result) {
+			console.log(result);//打印服务端返回的数据(调试用)
+			// if (result.code == 200) {
+			//
+			// }else{
+			// 	//$("#loginErrorInfo").text(result.msg);
+			// 	swal(result.msg + "");
+			// };
+			window.location.href = "/";
+		},
+		error : function() {
+			alert("异常！");
+		}
+	});
+}
+</script>
+<script th:src="@{/js/index.js}"></script>
+</html>

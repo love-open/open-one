@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liu.auth.mapper.AuthMapper">
+    <select id="findByUsername" resultType="com.liu.auth.domain.auth.UserDetail">
+        SELECT id, username, password from sys_user where username = #{username};
+    </select>
+
+    <insert id="insert" parameterType="com.liu.auth.domain.auth.UserDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_user (username, password) VALUES (#{username}, #{password});
+    </insert>
+
+    <insert id="insertRole">
+        insert into sys_user_role (user_id, role_id) VALUES (#{userId}, #{roleId});
+    </insert>
+
+    <select id="findRoleById" resultType="com.liu.auth.domain.auth.Role">
+      select id, name, unique_id as uniqueId from sys_role where id = #{roleId}
+    </select>
+
+    <select id="findRoleByUserId" resultType="com.liu.auth.domain.auth.Role">
+        select id, name, unique_id as uniqueId from sys_role where id in (SELECT role_id from sys_user_role where user_id = #{userId});
+    </select>
+</mapper>

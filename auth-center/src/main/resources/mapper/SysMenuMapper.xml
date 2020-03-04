@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liu.auth.mapper.SysMenuMapper">
+    <resultMap id="BaseResultMap" type="com.liu.auth.domain.SysMenu">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="parent_menu_id" jdbcType="VARCHAR" property="parentMenuId"/>
+        <result column="display_order" jdbcType="INTEGER" property="displayOrder"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="leaf_flag" jdbcType="BIT" property="leafFlag"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, url, parent_menu_id, display_order, remark ,icon,leaf_flag
+  </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_menu
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from sys_menu
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insertSelective" parameterType="com.liu.auth.domain.SysMenu">
+        insert into sys_menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="parentMenuId != null">
+                parent_menu_id,
+            </if>
+            <if test="displayOrder != null">
+                display_order,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="icon != null">
+                icon,
+            </if>
+            <if test="leafFlag != null">
+                leaf_flag,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="parentMenuId != null">
+                #{parentMenuId,jdbcType=VARCHAR},
+            </if>
+            <if test="displayOrder != null">
+                #{displayOrder,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="leafFlag != null">
+                #{leafFlag,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.liu.auth.domain.SysMenu">
+        update sys_menu
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="parentMenuId != null">
+                parent_menu_id = #{parentMenuId,jdbcType=VARCHAR},
+            </if>
+            <if test="displayOrder != null">
+                display_order = #{displayOrder,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                icon = #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="leafFlag != null">
+                leaf_flag = #{leafFlag,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="listSysMenus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_menu where 1=1
+        <if test="parentMenuIds != null and parentMenuIds.size >0">
+            and parent_menu_id in
+            <foreach collection="parentMenuIds" item="item" index="index" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+        <if test="url != null and url !=''">
+            <choose>
+                <when test="equalLikeFlag != null and equalLikeFlag =='equal'">
+                    and url = #{url,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and url like concat('%',#{url},'%')
+                </otherwise>
+            </choose>
+        </if>
+
+        <if test="isEmptyFlagKey != null and isEmptyFlagKey !=''">
+            <!--获取字段url == null or ''  作为为菜单分组tree节点-->
+            and url IS NULL OR url =''
+        </if>
+        <if test="notEmptyFlag != null and notEmptyFlag !=''">
+            <!--获取字段url 为非空   作为菜单明细-->
+            and url IS NOT NULL AND url !=''
+        </if>
+
+        <if test="parentMenuId != null and parentMenuId !=''">
+            and parent_menu_id = #{parentMenuId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="remark != null and remark !=''">
+            <choose>
+                <when test="equalLikeFlag != null and equalLikeFlag =='equal'">
+                    and remark = #{remark,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and remark like concat('%',#{remark},'%')
+                </otherwise>
+            </choose>
+        </if>
+
+        <if test="displayOrder != null and displayOrder !=''">
+            <choose>
+                <when test="equalLikeFlag != null and equalLikeFlag =='equal'">
+                    and display_order = #{displayOrder,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and display_order like concat('%',#{displayOrder},'%')
+                </otherwise>
+            </choose>
+        </if>
+
+        <if test="name != null and name !=''">
+            <choose>
+                <when test="equalLikeFlag != null and equalLikeFlag =='equal'">
+                    and name = #{name ,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and name like concat('%',#{name},'%')
+                </otherwise>
+            </choose>
+        </if>
+        order by display_order
+    </select>
+
+</mapper>

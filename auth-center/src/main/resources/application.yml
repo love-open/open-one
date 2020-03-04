@@ -1,0 +1,52 @@
+#服务器的相关配置
+server :
+  port : 8080
+
+#spring的相关配置
+spring :
+  #数据源配置
+  datasource :
+    url : jdbc:mysql://localhost:3306/auth?characterEncoding=utf8&useAffectedRows=true&allowMultiQueries=true&serverTimezone=GMT%2B8
+    username : root
+    password : root
+    driverClassName : com.mysql.cj.jdbc.Driver
+    platform: mysql
+    schema: classpath:/schema.sql
+    #第一次启动做建表用，之后注释掉
+    #initialization-mode: always
+
+  #当遇到同样名字的时候，是否允许覆盖注册
+  main :
+    allow-bean-definition-overriding : true
+
+  #thymeleaf
+  thymeleaf :
+    prefix : classpath:/templates/
+    cache : false
+
+  resources :
+    chain :
+      strategy :
+        content :
+          enabled : true
+          paths : /**
+
+ #国际化使用的文件位置
+  messages:
+     basename : i18n/messages
+
+mybatis :
+  config-location : classpath:/mybatis-config.xml
+  #Mapper.xml地址
+  mapper-locations: classpath*:mapper/*Mapper.xml
+
+# JWT
+jwt:
+  header: Authorization
+  secret: mySecret
+  #token有效期一天
+  expiration: 86400
+  tokenHead: "Bearer "
+
+#接口地址
+ry_url : http://127.0.0.1:8083/

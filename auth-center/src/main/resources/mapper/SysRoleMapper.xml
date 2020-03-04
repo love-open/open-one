@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liu.auth.mapper.SysRoleMapper">
+    <resultMap id="BaseResultMap" type="com.liu.auth.domain.SysRole">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="unique_id" jdbcType="VARCHAR" property="uniqueId"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, unique_id, remark
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_role
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from sys_role
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insertSelective" parameterType="com.liu.auth.domain.SysRole">
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="uniqueId != null">
+                unique_id,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueId != null">
+                #{uniqueId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.liu.auth.domain.SysRole">
+        update sys_role
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueId != null">
+                unique_id = #{uniqueId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <select id="listSysRoles" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_role where 1=1
+        <if test="name != null and name !=''">
+            <choose>
+                <when test="equalLikeFlag != null and equalLikeFlag =='equal'">
+                    and name = #{name ,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and name like concat('%', #{name},'%')
+                </otherwise>
+            </choose>
+        </if>
+        <if test="uniqueId != null and uniqueId !=''">
+            <choose>
+                <when test="equalLikeFlag != null and equalLikeFlag =='equal'">
+                    and unique_id = #{uniqueId, jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and unique_id like concat('%', #{uniqueId},'%')
+                </otherwise>
+            </choose>
+        </if>
+        <if test="remark != null and remark !=''">
+            and remark like concat('%',#{remark},'%')
+        </if>
+    </select>
+
+</mapper>

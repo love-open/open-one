@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="default/list_css::top">
+        <style type="text/css">
+            th, td {
+                white-space: nowrap;
+            }
+        </style>
+    </head>
+    <body class="hold-transition skin-blue sidebar-mini">
+        <section class="content-header">
+            <h1>
+                菜单管理
+                <small>菜单列表</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="#">
+                        <i class="fa fa-dashboard"></i>
+                        首页
+                    </a>
+                </li>
+                <li>
+                    <a href="#">菜单管理</a>
+                </li>
+                <li class="active">菜单列表</li>
+            </ol>
+        </section>
+        <!-- 左侧菜单分组添加修改模态框 -->
+        <div class="modal fade" id="MenuGroupModel" tabindex="-1" role="dialog"
+             aria-labelledby="MenuGroupModelLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="MenuGroupModelLabel">
+                            菜单信息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" th:object="${sysMenu}"
+                              id="MenuGroupModelForm"
+                              method="post">
+                            <input type="hidden" class="form-control m-input" th:field="*{id}" id="treeId">
+                            <input type="hidden" th:field="*{parentMenuId}" th:remark="${parentMenuId}"
+                                   id="MenuGroupparentMenuId">
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label">上级分组：</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control" id="parentGroupName" readonly>
+                                        <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="选择"
+                                           onclick="$('#selectMenuModal').modal('show');">...
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span
+                                            style="color:red;">*</span>名称
+                                    </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" th:field="*{name}"
+                                               id="MenuGroupName"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span
+                                            style="color:red;">*</span>排序
+                                    </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" th:field="*{displayOrder}"
+                                               id="displayOrder1"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="fa fa-reply btn btn-default" data-dismiss="modal">返回
+                                </button>
+                                <button type="submit" class="fa fa-save btn btn-info mr10">保存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!-- /.左侧菜单分组添加修改的模态框  -->
+        <!--  右侧基础数据添加修改的模态框  -->
+        <div class="modal fade" id="MenuModel" tabindex="-1" role="dialog"
+             aria-labelledby="MenuModelLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="MenuModelLabel">
+                            菜单信息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" th:object="${sysMenu}" id="MenuModelForm"
+                              method="post">
+                            <input type="hidden" class="form-control m-input" th:field="*{id}" id="id">
+                            <input type="hidden" th:field="*{parentMenuId}" th:remark="${parentMenuId}"
+                                   id="parentMenuId">
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label">上级分组：</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control" id="parentName" readonly>
+                                        <a class="btn btn-default" data-toggle="tooltip" data-placement="top" title="选择"
+                                           onclick="$('#selectMenuModal').modal('show');">...
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span
+                                            style="color:red;">*</span>名称
+                                    </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" th:field="*{name}"
+                                               id="name"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span
+                                            style="color:red;">*</span>路径
+                                    </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" th:field="*{url}" id="url"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span
+                                            style="color:red;">*</span>排序
+                                    </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" th:field="*{displayOrder}"
+                                               id="displayOrder"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span
+                                            style="color:red;">*</span>备注
+                                    </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" th:field="*{remark}" id="remark"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="fa fa-reply btn btn-default" data-dismiss="modal">返回
+                                </button>
+                                <button type="submit" class="fa fa-save btn btn-info mr10">保存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--  /.右侧基础数据添加修改的模态框  -->
+
+        <!--  模态框里的选择分组  -->
+        <div class="modal fade" id="selectMenuModal" tabindex="-1" role="dialog"
+             aria-labelledby="selectMenuModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="selectMenuModalLabel">
+                            选择分组
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="selectMenuTree"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="fa fa-reply btn btn-default" data-dismiss="modal">返回</button>
+                    </div>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--  /.模态框里的选择分组  -->
+
+        <!--  增删改查 相关按钮 -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="box box-warning">
+                        <div class="box-header with-border">
+                            <a class="btn btn-info mr10" id="addMenuGroupBtn">
+                                <i class="fa fa-plus"></i>
+                                增加
+                            </a>
+                            <a class="btn btn-info mr10" id="deleteMenuGroupBtn">
+                                <i class="fa fa-trash-o"></i>
+                                删除
+                            </a>
+                            <a class="btn btn-info mr10" id="updateMenuGroupBtn">
+                                <i class="fa fa-edit"></i>
+                                修改
+                            </a>
+                        </div>
+                        <div class="box-body">
+                            <div id="MenuTree"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-9">
+                    <div class="box box-warning">
+                        <div class="box-header with-border">
+                            <a class="btn btn-info mr10" id="addMenuBtn">
+                                <i class="fa fa-plus"></i>
+                                增加
+                            </a>
+                            <a class="btn btn-info mr10" id="deleteMenuBtn">
+                                <i class="fa fa-trash-o"></i>
+                                删除
+                            </a>
+                            <a class="btn btn-info mr10" id="updateMenuBtn">
+                                <i class="fa fa-edit"></i>
+                                修改
+                            </a>
+                            <a class="btn btn-info mr10" id="queryBtn">
+                                <i class="fa fa-search"></i>
+                                查询
+                            </a>
+                            <a class="btn btn-info mr10" id="resetBtn">
+                                <i class="fa fa-repeat"></i>
+                                重置
+                            </a>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="listSysMenus" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="center">
+                                            <input type="checkbox" class="checkAll" id="checkAll"/>
+                                        </th>
+                                        <th>序号</th>
+                                        <th>名称</th>
+                                        <th>路径</th>
+                                        <th>排序</th>
+                                        <th>备注</th>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="center">
+                                            <input type="text" class="form-control" name="search" id="name_input"
+                                                   placeholder="模糊查询"/>
+                                        </td>
+                                        <td align="center">
+                                            <input type="text" class="form-control" name="search" id="url_input"
+                                                   placeholder="模糊查询"/>
+                                        </td>
+                                        <td align="center">
+                                            <input type="text" class="form-control" name="search"
+                                                   id="displayOrder_input"
+                                                   placeholder="模糊查询"/>
+                                        </td>
+                                        <td align="center">
+                                            <input type="text" class="form-control" name="search" id="remark_input"
+                                                   placeholder="模糊查询"/>
+                                        </td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+            </div>
+        </section>
+        <!--   /.增删改查 相关按钮 -->
+    </body>
+    <script th:replace="default/list_js::importjs"></script>
+    <script th:src="@{/DataTables/Buttons-1.5.6/js/dataTables.buttons.min.js}"></script>
+    <script th:src="@{/DataTables/Buttons-1.5.6/js/buttons.html5.min.js}"></script>
+    <script th:src="@{/DataTables/Buttons-1.5.6/js/buttons.print.min.js}"></script>
+    <script th:src="@{/DataTables/JSZip-2.5.0/jszip.min.js}"></script>
+    <script th:src="@{/DataTables/pdfmake-0.1.36/pdfmake.min.js}"></script>
+    <script th:src="@{/DataTables/pdfmake-0.1.36/vfs_fonts.js}"></script>
+    <script type="text/javascript">
+
+        //Tree
+        //选择菜单节点Id
+        var selectedId = 'root';
+        //选择菜单节点Name
+        var selectedName = '';
+
+        //Modal
+        //选择上级菜单分组Id
+        var selectedparentMenuId = '';
+        //选择上级菜单分组Name
+        var selectedParentName = '';
+
+        //菜单分组修改标志  0:新增   1:修改
+        var updateGroupFlag = '0';
+        //菜单修改标志  0:新增   1:修改
+        var updateFlag = '0';
+        <!--  左侧Group模态框的调用方法  -->
+        $(function () {
+            $("#MenuGroupModelForm").validate({
+                highlight: function (e) {
+                    $(e).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (e) {
+                    $(e).closest('.form-group').removeClass('has-error');
+                },
+                submitHandler: function () {
+                    addSysMenuGroup();
+                }
+            });
+            <!--  右侧模态框的调用方法  -->
+            $("#MenuModelForm").validate({
+                highlight: function (e) {
+                    $(e).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (e) {
+                    $(e).closest('.form-group').removeClass('has-error');
+                },
+                submitHandler: function () {
+                    addMenu();
+                }
+            });
+
+            loadDataTableData();
+        });
+
+        //加载菜单分组tree
+        $('#MenuTree')
+            .jstree({
+                'core': {
+                    'data': {
+                        'url': '/menu/getTree',
+                        beforeSend: function(xhr, settings){
+                            xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                        }
+                    }
+                },
+
+            })
+            // 展开菜单所有节点
+            .on("loaded.jstree", function (event, data) {
+                $('#MenuTree').jstree('open_all');
+            })
+            //获得菜单点击节点的id
+            .on("changed.jstree", function (e, data) {
+                // 获取当前菜单节点下的目录列表
+                selectedId = data.node.id;
+                selectedName = data.node.text;
+                //加载当前菜单节点下的数据
+                sysMenuTable.ajax.reload();
+            });
+
+        //加载菜单分组Modaltree
+        $('#selectMenuTree')
+            .jstree({
+                'core': {
+                    'data': {
+                        'url': "/menu/getTree",
+                        beforeSend: function(xhr, settings){
+                            xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                        }
+                    }
+                }
+            })
+            // 展开菜单所有节点
+            .on("loaded.jstree", function (event, data) {
+                $('#selectMenuTree').jstree('open_all');
+                //显示默认分组
+                var node = $('#selectMenuTree').jstree("get_node", $.trim($('#parentMenuId').val()));
+                $('#parentName').val(node.text);
+            })
+            //获得点击菜单节点的id
+            .on("changed.jstree", function (e, data) {
+                selectedparentMenuId = data.node.id;
+                selectedParentName = data.node.text;
+                $('#parentName').val(selectedParentName);
+            });
+
+
+        //添加菜单分组
+        function addSysMenuGroup() {
+            var params = {};
+            //新增
+            if (updateGroupFlag == '0') {
+                params = {
+                    name: $.trim($('#MenuGroupName').val()),
+                    displayOrder: $.trim($('#displayOrder1').val()),
+                    parentMenuId: selectedparentMenuId
+                };
+            }
+            //修改
+            else {
+                params = {
+                    id: selectedId,
+                    name: $.trim($('#MenuGroupName').val()),
+                    displayOrder: $.trim($('#displayOrder1').val()),
+                    parentMenuId: selectedparentMenuId
+                };
+            }
+            $.ajax({
+                type: "post",
+                data: params,
+                url: "/menu/addSysMenuGroup",
+                dataType: "json",
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+                success: function (data) {
+                    if (data.code) {
+                        swal('提示', data.msg, 'success');
+                        //刷新当前
+                        setTimeout(function () {
+                            history.go(0);
+                        }, 1500);
+                    } else {
+                        swal('提示', data.msg, 'warning');
+                    }
+                }
+            })
+        }
+
+        //添加菜单分组
+        $('#addMenuGroupBtn').click(function () {
+            updateGroupFlag = '0';
+            //清空
+            $('.m-input').val('');
+            //显示上级分组
+            var node = $('#selectMenuTree').jstree("get_node", selectedId);
+            $('#parentGroupName').val(node.text);
+            selectedparentMenuId = selectedId;
+            $('#MenuGroupModel').modal('show');
+
+
+        });
+        //修改菜单分组
+        $('#updateMenuGroupBtn').click(function () {
+            updateGroupFlag = '1';
+            if (selectedId == 'root') {
+                swal('提示', '请选择有效节点！', 'warning');
+                return;
+            }
+            var params = {
+                id: selectedId
+            };
+            $.ajax({
+                url: '/menu/getMenu',
+                data: params,
+                dataType: 'json',
+                type: "post",
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+                success: function (data) {
+                    if (data) {
+                        // 1,提示
+                        if (data.code) {
+                            //清空
+                            $('.m-input').val('');
+                            var sysMenu = data.sysMenu;
+                            //获取父节点
+                            var node = $('#selectMenuTree').jstree("get_node", sysMenu.parentMenuId);
+                            $('#parentGroupName').val(node.text);
+                            selectedparentMenuId = sysMenu.parentId;
+                            $('#MenuGroupName').val(sysMenu.name);
+                            $('#displayOrder1').val(sysMenu.displayOrder);
+                            $('#MenuGroupModel').modal('show');
+                        } else {
+                            swal('提示', data.msg, 'warning');
+                        }
+                    }
+                }
+            });
+        });
+
+        //删除菜单分组
+        $('#deleteMenuGroupBtn').click(function () {
+            if (selectedId == 'root') {
+                swal('提示', '请选择有效节点！', 'warning');
+                return;
+            }
+            swal({
+                title: '警告',
+                text: '确定删除：' + selectedName + '？',
+                type: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '确定！',
+                cancelButtonText: '取消！',
+            }).then(function (obj) {
+                if (obj.value) {
+                    var params = {
+                        id: selectedId
+                    };
+                    $.ajax({
+                        url: '/menu/deleteMenuGroup',
+                        dataType: 'json',
+                        type: "post",
+                        data: params,
+                        beforeSend: function(xhr, settings){
+                            xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                        },
+                        success: function (data) {
+                            if (data) {
+                                // 1,提示
+                                if (data.code) {
+                                    swal('提示', data.msg, 'success');
+                                    //刷新当前
+                                    setTimeout(function () {
+                                        history.go(0);
+                                    }, 1500);
+                                } else {
+                                    swal('提示', data.msg, 'warning');
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+        });
+
+        //菜单表格
+        var sysMenuTable;
+
+        //加载表格数据
+        function loadDataTableData() {
+            sysMenuTable = $('#listSysMenus').DataTable({
+                "dom": '<"top">tlir<"datatable-footer"p><"clear">',
+                "aLengthMenu": [10, 25, 50, 100],
+                "bAutoWidth": false,
+                'bPaginate': true,
+                "bDestory": true,
+                "bRetrieve": true,
+                "bFilter": false,
+                "bSort": false,
+                "bProcessing": true,
+                "scrollX": true,
+                "serverSide": true,
+                "fixedHeader": [{
+                    header: true,
+                }],
+                "scrollY": yHeight - 400 + 'px',
+                "iDisplayLength": 10,
+                "columns": [
+                    {
+                        "sClass": "text-center",
+                        "data": "id",
+                        "render": function (data, type) {
+                            return "<div align='center'><input type='checkbox' onclick = childclick() name='ckb_id' value='" + data + "'></div>";
+                        },
+                        "bSortable": false
+                    },
+
+                    {
+                        "data": null,
+                        render: function (data, type, row, meta) {
+                            // 显示行号,
+                            var startIndex = meta.settings._iDisplayStart;
+                            return (startIndex + meta.row + 1).toString();
+                        }
+                    },
+                    // {"data": "parentMenuId"},
+                    {"data": "name"},
+                    {"data": "url"},
+                    {"data": "displayOrder"},
+                    {"data": "remark"}
+                ],
+                "ajax": {
+                    type: "post",
+                    url: '/menu/listSysMenus',
+                    beforeSend: function(xhr, settings){
+                        xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                    },
+                    data: function (d) {
+                        d.parentMenuId = selectedId;
+                        d.name = $.trim($('#name_input').val());
+                        d.url = $.trim($('#url_input').val());
+                        d.remark = $.trim($('#remark_input').val());
+                        d.displayOrder = $.trim($('#displayOrder_input').val());
+                        return d;
+                    }
+                },
+                "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                    $(nRow).css("cursor", "pointer");
+                },
+                "oLanguage": {
+                    "sProcessing": "努力加载中...",
+                    "sLengthMenu": "显示 _MENU_ 项结果",
+                    "sZeroRecords": "没有数据",
+                    "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                    "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                    "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜索:",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上页",
+                        "sNext": "下页",
+                        "sLast": "末页"
+                    }
+                }
+            })
+        }
+
+        //菜单添加
+        function addMenu() {
+            var params = {};
+            //新增
+            if (updateFlag == '0') {
+                params = {
+                    name: $.trim($('#name').val()),
+                    url: $.trim($('#url').val()),
+                    remark: $.trim($('#remark').val()),
+                    displayOrder: $.trim($('#displayOrder').val()),
+                    parentMenuId: selectedparentMenuId
+                };
+            }
+            //修改
+            else {
+                params = {
+                    id: $('input[name="ckb_id"]:checked').val(),
+                    name: $.trim($('#name').val()),
+                    url: $.trim($('#url').val()),
+                    remark: $.trim($('#remark').val()),
+                    displayOrder: $.trim($('#displayOrder').val()),
+                    parentMenuId: selectedparentMenuId
+
+                };
+            }
+            $.ajax({
+                type: "post",
+                data: params,
+                url: "/menu/addSysMenuTree",
+                dataType: "json",
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+                success: function (data) {
+                    if (data.code) {
+                        swal('提示', data.msg, 'success');
+                        //刷新当前
+                        setTimeout(function () {
+                            history.go(0);
+                        }, 1000);
+                    } else {
+                        swal('提示', data.msg, 'warning');
+                    }
+                }
+            })
+        }
+
+        //右侧菜单Modal添加
+        $('#addMenuBtn').click(function () {
+            updateFlag = '0';
+            //清空
+            $('.m-input').val('');
+            //获取选中节点
+            var node = $('#selectMenuTree').jstree("get_node", selectedId);
+            $('#parentName').val(node.text);
+            selectedparentMenuId = selectedId;
+
+            $('#MenuModel').modal('show');
+
+
+        });
+
+
+        //右侧修改
+        $('#updateMenuBtn').click(function () {
+            updateFlag = '1';
+            //清空
+            $('.m-input').val('');
+            //显示上级分组
+            var node = $('#selectMenuTree').jstree("get_node", selectedId);
+            $('#parentName').val(node.text);
+            var checkedBox = $("input[name='ckb_id']:checked");
+            if (checkedBox.length != 1) {
+                swal('提示', '请选择一条记录，修改！', 'warning');
+                return;
+            }
+            var params = {
+                id: $('input[name="ckb_id"]:checked').val()
+            };
+            $.ajax({
+                url: '/menu/getMenu',
+                data: params,
+                dataType: 'json',
+                type: "post",
+                beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                },
+                success: function (data) {
+                    if (data) {
+                        // 1,提示
+                        if (data.code) {
+                            var sysMenu = data.sysMenu;
+                            var node = $('#selectMenuTree').jstree("get_node", sysMenu.parentMenuId);
+                            selectedparentMenuId = sysMenu.parentMenuId;
+                            $('#remark').val(sysMenu.remark);
+                            $('#url').val(sysMenu.url);
+                            $('#displayOrder').val(sysMenu.displayOrder);
+                            $('#name').val(sysMenu.name);
+                            $('#parentName').val(node.text);
+
+                            $('#MenuModel').modal('show');
+                        } else {
+                            swal('提示', data.msg, 'warning');
+                        }
+                    }
+                }
+            });
+        });
+
+        //右侧删除
+        $('#deleteMenuBtn').click(function () {
+            var checkedBox = $("input[name='ckb_id']:checked");
+            if (checkedBox.length == 0) {
+                swal('提示', '至少选择一条记录，删除！', 'warning');
+                return;
+            }
+            var ids = [];
+            $('input[name="ckb_id"]:checked').each(function () {
+                ids.push($(this).val());
+            });
+            swal({
+                title: '警告',
+                text: '确定删除：' + ids.length + '条记录？',
+                type: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '确定！',
+                cancelButtonText: '取消！',
+            }).then(function (obj) {
+                if (obj.value) {
+                    var params = {
+                        ids: ids
+                    };
+                    $.ajax({
+                        url: '/menu/deleteMenu',
+                        dataType: 'json',
+                        type: "post",
+                        data: params,
+                        traditional: true,
+                        beforeSend: function(xhr, settings){
+                            xhr.setRequestHeader("Authorization",  parent.sysUsersView.token);
+                        },
+                        success: function (data) {
+                            if (data) {
+                                // 1,提示
+                                if (data.code) {
+                                    swal('提示', data.msg, 'success');
+                                    //刷新当前
+                                    setTimeout(function () {
+                                        history.go(0);
+                                    }, 1000);
+                                } else {
+                                    swal('提示', data.msg, 'warning');
+                                }
+                            }
+                        }
+
+                    });
+                }
+            })
+        });
+
+
+        // 实现全选功能
+        $('#checkAll').on('click', function () {
+            if (this.checked) {
+                $(this).attr('checked', 'checked');
+                $("input[name='ckb_id']").each(function () {
+                    this.checked = true;
+                });
+            } else {
+                $(this).removeAttr('checked');
+                $("input[name='ckb_id']").each(function () {
+                    this.checked = false;
+                });
+            }
+        });
+
+        // 选中事件
+        function childclick(id) {
+            if ($(this).is(":checked") == false) {
+                $("#checkAll").prop("checked", false);
+            }
+        }
+
+        // 双击选中产品分组
+        $(selectMenuModal).dblclick(function () {
+            //关闭model
+            $("#selectMenuModal").modal('hide');
+        });
+        // 回车键绑定
+        $("input[name='search']").bind('keypress', function (event) {
+            if (event.keyurl == "13") {
+                sysMenuTable.ajax.reload();
+            }
+        });
+        // 查询
+        $('#queryBtn').click(function () {
+            sysMenuTable.ajax.reload();
+        });
+        // 重置
+        $('#resetBtn').click(function () {
+            $("input[name='search']").val('');
+            sysMenuTable.ajax.reload();
+        })
+    </script>
+</html>

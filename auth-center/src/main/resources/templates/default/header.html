@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<body>
+<header class="main-header" th:fragment="header">
+    <!-- Logo -->
+    <a href="#" class="logo">
+        <!-- mini logo for sidebar mini 50x50 pixels -->
+        <!-- logo for regular state and mobile devices -->
+        <span class="logo-lg"><b>OPEN-ONE</b></span>
+    </a>
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation">
+        <!-- Sidebar toggle button-->
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+        </a>
+        <!-- Navbar Right Menu -->
+        <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+                <span sec:authentication="name" hidden id="curAccount"></span>
+                <li role="presentation" class="dropdown user-menu">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);" title="账号信息" onclick="editCurAccount()" role="button" aria-haspopup="true" aria-expanded="false" id="currentUser">
+                        <img th:src="@{/blueindustry/img/user-25x25.jpg}" class="user-image" alt="User Image" >
+                    </a>
+                </li>
+                <li>
+                    <a href="/logout">退出</a>
+                </li>
+                <li role="presentation" class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        语言 <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href='javascript:void(0);' onclick=setLang('zh_CN')> 中文</a></li>
+                        <li><a href='javascript:void(0);' onclick=setLang('en_US')>English</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!-- 编辑账号模态框（Modal） -->
+        <div class="modal fade" id="editCurAccountModal" role="dialog"  aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            用户信息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="editCurAccountForm"
+                              method="post">
+                            <input type="hidden" class="form-control m-input" id="editCurAccountId">
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>账号</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input"
+                                               id="editCurAccountAccount" required disabled="disabled">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>姓名</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input"  id="editCurAccountName"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group  m-form__group row">
+                                    <label class="col-lg-3 col-form-label">电话</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" id="editCurAccountTel">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group  m-form__group row">
+                                    <label class="col-lg-3 col-form-label">邮箱</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" class="form-control m-input" id="editCurAccountEmail">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="submit" class="btn btn-primary">保存</button>
+                                <button type="button" class="btn btn-warning" id="updatePwdBtn">修改密码</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 修改密码Modal -->
+        <div class="modal fade" id="updatePwdModal" role="dialog"  aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            修改密码
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" id="updatePwdForm" method="post">
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>原密码</label>
+                                    <div class="col-lg-6">
+                                        <input type="password" class="form-control m-input"
+                                               id="oldPassword" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>新密码</label>
+                                    <div class="col-lg-6">
+                                        <input type="password" class="form-control m-input"  id="newPassword"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-inline">
+                                <div class="form-group m-form__group row">
+                                    <label class="col-lg-3 col-form-label"><span style="color:red;">*</span>确认新密码</label>
+                                    <div class="col-lg-6">
+                                        <input type="password" class="form-control m-input"  id="confirmPassword"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="submit" class="btn btn-primary">保存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+</header>
+</body>
+</html>
